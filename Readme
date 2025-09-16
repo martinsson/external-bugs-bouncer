@@ -1,0 +1,50 @@
+# External Bugs Bouncer
+
+## Purpose
+
+This project provides an example of how to test that a REST service is always up and provides basic functionality. It demonstrates how to verify that an external API service can:
+
+- **List resources** - Retrieve all posts from the service
+- **Create resources** - Add new posts to the service
+- **Get individual resources** - Fetch a specific post by ID
+- **Parse JSON responses** - Ensure API responses are properly formatted and parseable
+- **Periodic CI** - Tests are run in a CI/CD pipeline on a regular schedule and alerts whenever tests fail
+
+The project uses the [JSONPlaceholder API](https://jsonplaceholder.typicode.com/) as a test target, which is a free fake REST API for testing and prototyping.
+
+
+You can copy and adapt this to your own project as inspiration.
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17 or higher
+- Maven 3.6+
+
+### Building the Project
+
+```bash
+mvn clean compile
+```
+
+### Running Tests
+
+```bash
+mvn test
+```
+
+## API Operations Tested
+
+### 1. List All Posts
+- **Endpoint**: `GET /posts`
+- **Verification**: Ensures the service returns a non-empty list of posts with valid data
+
+### 2. Create New Post
+- **Endpoint**: `POST /posts`
+- **Verification**: Creates a post and validates it can be retrieved afterward
+
+### 3. Get Post by ID
+- **Endpoint**: `GET /posts/{id}`
+- **Verification**: Retrieves a specific post and validates the response structure
+

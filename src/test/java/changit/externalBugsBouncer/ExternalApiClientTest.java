@@ -12,7 +12,7 @@ public class ExternalApiClientTest {
 
     @Test
     public void testGetPostsEndpointReturns200() throws IOException {
-        List<PostRecord> posts = externalApiClient.invokePostRecords();
+        List<PostRecord> posts = externalApiClient.getPosts();
 
         assertThat(posts).isNotEmpty();
         PostRecord firstPost = posts.get(0);

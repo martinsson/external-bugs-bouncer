@@ -22,19 +22,19 @@ public class ExternalApiClient {
         this.url = url;
     }
 
-    public List<PostRecord> invokePostRecords() throws IOException {
+    public List<PostRecord> getPosts() throws IOException {
         String responseString = executeGetRequest(this.url);
         return mapper.readValue(responseString, new TypeReference<>() {});
+    }
+
+    public PostRecord getPostById(int id) throws IOException {
+        String responseString = executeGetRequest(this.url + "/" + id);
+        return mapper.readValue(responseString, PostRecord.class);
     }
 
     public PostRecord createPost(PostRecord post) throws IOException {
         String jsonInputString = mapper.writeValueAsString(post);
         String responseString = executePostRequest(this.url, jsonInputString);
-        return mapper.readValue(responseString, PostRecord.class);
-    }
-
-    public PostRecord getPostById(int id) throws IOException {
-        String responseString = executeGetRequest(this.url + "/" + id);
         return mapper.readValue(responseString, PostRecord.class);
     }
 
