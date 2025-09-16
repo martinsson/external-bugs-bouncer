@@ -1,0 +1,39 @@
+# GitLab CI Pipeline for Running Tests
+stages:
+  - test
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+test:
+  stage: test
+  image: openjdk:17-jdk
+
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq maven
+
+  script:
+    - mvn clean test
+
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+    paths:
+      - target/surefire-reports/
+    expire_in: 1 week
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# Scheduled pipeline (equivalent to GitHub Actions cron)
+# This needs to be configured in GitLab UI under CI/CD > Schedules
+# Set to run daily at 6:00 AM UTC with cron: 0 6 * * *
