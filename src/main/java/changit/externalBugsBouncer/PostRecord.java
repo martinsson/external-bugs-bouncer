@@ -1,8 +1,4 @@
 package changit.externalBugsBouncer;
 
-class PostRecord {
-    public int userId;
-    public int id;
-    public String title;
-    public String body;
+public record PostRecord(int userId, int id, String title, String body) {
 }
