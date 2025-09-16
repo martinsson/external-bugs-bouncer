@@ -15,10 +15,11 @@ public class ExternalApiClientTest {
         List<PostRecord> posts = externalApiClient.invokePostRecords();
 
         assertThat(posts).isNotEmpty();
-        assertThat(posts.get(0).userId).isGreaterThan(0);
-        assertThat(posts.get(0).id).isGreaterThan(0);
-        assertThat(posts.get(0).title).isNotEmpty();
-        assertThat(posts.get(0).body).isNotEmpty();
+        PostRecord firstPost = posts.get(0);
+        assertThat(firstPost.userId).isGreaterThan(0);
+        assertThat(firstPost.id).isGreaterThan(0);
+        assertThat(firstPost.title).isNotEmpty();
+        assertThat(firstPost.body).isNotEmpty();
     }
 
 }
