@@ -60,4 +60,19 @@ public class ExternalApiClient {
         connection.disconnect();
         return createdPost;
     }
+
+    PostRecord getPostById(int id) throws IOException {
+        URL url = new URL(this.url + "/" + id);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        String responseString = new BufferedReader(new InputStreamReader(connection.getInputStream()))
+                .lines()
+                .collect(Collectors.joining());
+
+        ObjectMapper mapper = new ObjectMapper();
+        PostRecord post = mapper.readValue(responseString, PostRecord.class);
+        connection.disconnect();
+        return post;
+    }
 }
