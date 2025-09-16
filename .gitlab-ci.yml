@@ -3,7 +3,10 @@ stages:
   - test
 
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  HTTP_PROXY: "http://corporate-proxy:8080"
+  HTTPS_PROXY: "http://corporate-proxy:8080"
+  NO_PROXY: "localhost,127.0.0.1,.internal.domain"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dhttp.proxyHost=corporate-proxy -Dhttp.proxyPort=8080 -Dhttps.proxyHost=corporate-proxy -Dhttps.proxyPort=8080"
 
 cache:
   paths:
