@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class ExternalApiClient {
 
 
         ObjectMapper mapper = new ObjectMapper();
-        List<PostRecord> posts = mapper.readValue(responseString, new TypeReference<List<PostRecord>>() {
+        List<PostRecord> posts = mapper.readValue(responseString, new TypeReference<>() {
         });
         connection.disconnect();
         return posts;
@@ -48,7 +49,7 @@ public class ExternalApiClient {
         String jsonInputString = mapper.writeValueAsString(post);
 
         try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 

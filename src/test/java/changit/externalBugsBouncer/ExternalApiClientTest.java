@@ -25,25 +25,22 @@ public class ExternalApiClientTest {
     @Test
     public void testCreatePostEndpointCreatesPost() throws IOException {
         // Create a new post
-        PostRecord newPost = new PostRecord(1, 0, "qui est esse", "est rerum tempore vitae\n" +
-                                                                  "sequi sint nihil reprehenderit dolor beatae ea dolores neque\n" +
-                                                                  "fugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\n" +
-                                                                  "qui aperiam non debitis possimus qui neque nisi nulla");
+        var body = "est rerum tempore vitae\n" +
+                   "sequi sint nihil reprehenderit dolor beatae ea dolores neque\n" +
+                   "fugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\n" +
+                   "qui aperiam non debitis possimus qui neque nisi nulla";
+        PostRecord newPost = new PostRecord(1, 0, "qui est esse", body);
 
-        // Create the post via API
         PostRecord createdPost = externalApiClient.createPost(newPost);
 
         // Verify the post was created by fetching it from the API
         var createdPostId = createdPost.id();
-        createdPostId = 2; // this api is not actually writable, but let's imagine it is
-        // this is what we'd do if it were writable
+        createdPostId = 2; // this api is not actually writable, it only pretends to be
+        // but let's imagine it is and write the test as if it were
         PostRecord fetchedPost = externalApiClient.getPostById(createdPostId);
 
-        assertThat(fetchedPost).isNotNull();
-        assertThat(fetchedPost.userId()).isEqualTo(newPost.userId());
-        assertThat(fetchedPost.title()).isEqualTo(newPost.title());
-        assertThat(fetchedPost.body()).isEqualTo(newPost.body());
-        assertThat(fetchedPost.id()).isEqualTo(createdPostId);
+        var expectedPost = new PostRecord(newPost.userId(), createdPostId, newPost.title(), newPost.body());
+        assertThat(fetchedPost).usingRecursiveAssertion().isEqualTo(expectedPost);
     }
 
 }
