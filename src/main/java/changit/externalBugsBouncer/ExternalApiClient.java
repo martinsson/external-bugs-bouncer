@@ -16,64 +16,58 @@ import java.util.stream.Collectors;
 public class ExternalApiClient {
 
     private final String url;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public ExternalApiClient(String url) {
         this.url = url;
     }
 
-    List<PostRecord> invokePostRecords() throws IOException {
-        URL url = new URL(this.url);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-
-        String responseString = new BufferedReader(new InputStreamReader(connection.getInputStream()))
-                .lines()
-                .collect(Collectors.joining());
-
-
-        ObjectMapper mapper = new ObjectMapper();
-        List<PostRecord> posts = mapper.readValue(responseString, new TypeReference<>() {
-        });
-        connection.disconnect();
-        return posts;
+    public List<PostRecord> invokePostRecords() throws IOException {
+        String responseString = executeGetRequest(this.url);
+        return mapper.readValue(responseString, new TypeReference<>() {});
     }
 
-    PostRecord createPost(PostRecord post) throws IOException {
-        URL url = new URL(this.url);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    public PostRecord createPost(PostRecord post) throws IOException {
+        String jsonInputString = mapper.writeValueAsString(post);
+        String responseString = executePostRequest(this.url, jsonInputString);
+        return mapper.readValue(responseString, PostRecord.class);
+    }
+
+    public PostRecord getPostById(int id) throws IOException {
+        String responseString = executeGetRequest(this.url + "/" + id);
+        return mapper.readValue(responseString, PostRecord.class);
+    }
+
+    private String executeGetRequest(String urlString) throws IOException {
+        HttpURLConnection connection = createConnection(urlString);
+        connection.setRequestMethod("GET");
+        return getResponseString(connection);
+    }
+
+    private String executePostRequest(String urlString, String jsonBody) throws IOException {
+        HttpURLConnection connection = createConnection(urlString);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
 
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonInputString = mapper.writeValueAsString(post);
-
         try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
         }
 
-        String responseString = new BufferedReader(new InputStreamReader(connection.getInputStream()))
-                .lines()
-                .collect(Collectors.joining());
-
-        PostRecord createdPost = mapper.readValue(responseString, PostRecord.class);
-        connection.disconnect();
-        return createdPost;
+        return getResponseString(connection);
     }
 
-    PostRecord getPostById(int id) throws IOException {
-        URL url = new URL(this.url + "/" + id);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+    private HttpURLConnection createConnection(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        return (HttpURLConnection) url.openConnection();
+    }
 
-        String responseString = new BufferedReader(new InputStreamReader(connection.getInputStream()))
-                .lines()
-                .collect(Collectors.joining());
-
-        ObjectMapper mapper = new ObjectMapper();
-        PostRecord post = mapper.readValue(responseString, PostRecord.class);
-        connection.disconnect();
-        return post;
+    private String getResponseString(HttpURLConnection connection) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            String response = reader.lines().collect(Collectors.joining());
+            connection.disconnect();
+            return response;
+        }
     }
 }
